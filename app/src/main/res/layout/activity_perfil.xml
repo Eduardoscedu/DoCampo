@@ -1,0 +1,59 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_login_gradient"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_user" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/profileName"
+        android:text="Nome do usuário"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/profileEmail"
+        android:text="email@exemplo.com"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/textViewDataCadastro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Cadastrado em: --/--/----"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/textViewTotalFavoritos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Receitas Favoritas: 0"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+
+
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/btnLogout"
+        android:text="Voltar"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center"/>
+</LinearLayout>

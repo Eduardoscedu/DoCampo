@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Marketplace1101</string>
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="senha">Senha</string>
+    <string name="entrar">Entrar</string>
+    <string name="ainda_n_o_tem_conta_registre_se">Ainda não tem conta? Registre-se</string>
+    <string name="criar_conta">Criar Conta</string>
+    <string name="nome">Nome</string>
+    <string name="cpf">CPF</string>
+    <string name="confirmar_senha">Confirmar Senha</string>
+    <string name="registrar">Registrar</string>
+    <string name="navigation_drawer_open">Abrir menu</string>
+    <string name="navigation_drawer_close">Fechar menu</string>
+    <string name="esqueceu_sua_senha">Esqueceu sua Senha?</string>
+</resources>

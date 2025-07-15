@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Marketplace1101" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Cor primária do seu app -->
+        <item name="colorPrimary">@color/red</item>
+        <item name="colorPrimaryVariant">@color/dark_red</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Cor de fundo padrão -->
+        <item name="android:colorBackground">@color/white</item>
+
+        <!-- Cor dos Chips selecionados -->
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Choice</item>
+    </style>
+
+
+</resources>
