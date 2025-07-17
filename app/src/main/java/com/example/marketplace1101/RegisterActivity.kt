@@ -1,8 +1,10 @@
 package com.example.marketplace1101
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,6 +18,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var btnback: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,12 @@ class RegisterActivity : AppCompatActivity() {
         val passwordField = findViewById<EditText>(R.id.editTextRegisterPassword)
         val confirmPasswordField = findViewById<EditText>(R.id.editTextRegisterConfirmPassword)
         val buttonRegister = findViewById<Button>(R.id.buttonRegister)
+        btnback = findViewById(R.id.btn_back)
+
+        btnback.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
 
         buttonRegister.setOnClickListener {
             val name = nameField.text.toString().trim()

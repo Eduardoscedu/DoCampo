@@ -130,7 +130,7 @@ class RecipeListActivity : AppCompatActivity() {
 
         val headerView = navigationView.getHeaderView(0)
         val userName = headerView.findViewById<TextView>(R.id.textUserName)
-        userName.text = "Olá"
+        userName.text = "Olá Cozinheiro!"
 
         val userImage2 = findViewById<ImageView>(R.id.userImage)
         userImage2.setOnClickListener {

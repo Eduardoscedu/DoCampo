@@ -2,6 +2,7 @@ package com.example.marketplace1101
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,7 @@ class FavoritosActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ReceitaAdapter
     private val listaFavoritos = mutableListOf<Receita>()
+    private lateinit var btnback: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,7 @@ class FavoritosActivity : AppCompatActivity() {
         // Configura RecyclerView e Adapter
         recyclerView = findViewById(R.id.recyclerViewFavoritos)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        btnback = findViewById(R.id.btn_back)
 
         // 👇 Aqui você define o clique para abrir a receita
         adapter = ReceitaAdapter(listaFavoritos) { receita ->
@@ -42,7 +45,13 @@ class FavoritosActivity : AppCompatActivity() {
 
         // Carrega os favoritos do Firebase
         carregarFavoritos()
+
+        btnback.setOnClickListener {
+            startActivity(Intent(this, RecipeListActivity::class.java))
+            finish()
+        }
     }
+
 
     // Busca os favoritos no Firebase Realtime Database
     private fun carregarFavoritos() {

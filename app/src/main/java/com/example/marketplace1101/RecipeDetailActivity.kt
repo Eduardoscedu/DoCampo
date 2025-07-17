@@ -1,7 +1,10 @@
+// RecipeDetailActivity.kt
 package com.example.marketplace1101
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,6 +22,7 @@ class RecipeDetailActivity : AppCompatActivity() {
     private lateinit var origem: TextView
     private lateinit var instrucoes: TextView
     private lateinit var btnFavorite: ImageView
+    private lateinit var btnback: ImageButton
 
     private var isFavorito = false
     private lateinit var receitaId: String
@@ -36,9 +40,7 @@ class RecipeDetailActivity : AppCompatActivity() {
         origem = findViewById(R.id.detailCategoria)
         instrucoes = findViewById(R.id.detailInstrucoes)
         btnFavorite = findViewById(R.id.btnFavorite)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Detalhes da Receita"
+        btnback = findViewById(R.id.btn_back)
 
         receitaId = intent.getStringExtra("id") ?: return
 
@@ -59,10 +61,45 @@ class RecipeDetailActivity : AppCompatActivity() {
 
                     nome.text = nomeReceita
                     origem.text = "Origem: $origemReceita"
-                    instrucoes.text = instrucoesReceita
+
+                    val translationRetrofit = Retrofit.Builder()
+                        .baseUrl("https://api.mymemory.translated.net/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    val translationService = translationRetrofit.create(TranslationService::class.java)
+                    val blocos = dividirTexto(instrucoesReceita)
+                    val traducoes = mutableListOf<String>()
+
+                    fun traduzirProximoBloco(index: Int) {
+                        if (index >= blocos.size) {
+                            val instrucoesTraduzidas = traducoes.joinToString(" ")
+                            instrucoes.text = instrucoesTraduzidas
+                            instrucoesReceita = instrucoesTraduzidas
+                            return
+                        }
+
+                        translationService.translate(blocos[index]).enqueue(object : Callback<MyMemoryResponse> {
+                            override fun onResponse(call: Call<MyMemoryResponse>, response: Response<MyMemoryResponse>) {
+                                if (response.isSuccessful) {
+                                    traducoes.add(response.body()?.responseData?.translatedText ?: blocos[index])
+                                } else {
+                                    traducoes.add(blocos[index])
+                                }
+                                traduzirProximoBloco(index + 1)
+                            }
+
+                            override fun onFailure(call: Call<MyMemoryResponse>, t: Throwable) {
+                                traducoes.add(blocos[index])
+                                traduzirProximoBloco(index + 1)
+                            }
+                        })
+                    }
+
+                    traduzirProximoBloco(0)
+
                     Picasso.get().load(imagemUrlReceita).into(image)
 
-                    //Verificação se Ja está nos favoritos!
                     val receitaId = it.idMeal
                     val uid = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -74,11 +111,9 @@ class RecipeDetailActivity : AppCompatActivity() {
 
                         ref.get().addOnSuccessListener { snapshot ->
                             if (snapshot.exists()) {
-                                // Já está nos favoritos
                                 isFavorito = true
                                 btnFavorite.setImageResource(R.drawable.ic_favorite_filled)
                             } else {
-                                // Ainda não está
                                 isFavorito = false
                                 btnFavorite.setImageResource(R.drawable.ic_favorite_border)
                             }
@@ -93,6 +128,11 @@ class RecipeDetailActivity : AppCompatActivity() {
                 Toast.makeText(this@RecipeDetailActivity, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
             }
         })
+
+        btnback.setOnClickListener {
+            startActivity(Intent(this, RecipeListActivity::class.java))
+            finish()
+        }
 
         btnFavorite.setOnClickListener {
             if (!isFavorito) {
@@ -113,7 +153,6 @@ class RecipeDetailActivity : AppCompatActivity() {
         val database = FirebaseDatabase.getInstance()
         val referencia = database.getReference("favoritos").child(uid).child(receitaId)
 
-        //Adicona esta variaveis no Banco de dados - REALTIME DATABASE -
         val receitaFavorita = mapOf(
             "id" to receitaId,
             "nome" to nomeReceita,
@@ -130,9 +169,7 @@ class RecipeDetailActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Erro ao salvar favorito: ${e.message}", Toast.LENGTH_LONG).show()
-                e.printStackTrace()
             }
-
     }
 
     private fun removerFavorito() {
@@ -149,6 +186,27 @@ class RecipeDetailActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Erro ao remover favorito", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun dividirTexto(texto: String, limite: Int = 500): List<String> {
+        val palavras = texto.split(" ")
+        val blocos = mutableListOf<String>()
+        var blocoAtual = ""
+
+        for (palavra in palavras) {
+            if (blocoAtual.length + palavra.length + 1 <= limite) {
+                blocoAtual += if (blocoAtual.isEmpty()) palavra else " $palavra"
+            } else {
+                blocos.add(blocoAtual)
+                blocoAtual = palavra
+            }
+        }
+
+        if (blocoAtual.isNotEmpty()) {
+            blocos.add(blocoAtual)
+        }
+
+        return blocos
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
