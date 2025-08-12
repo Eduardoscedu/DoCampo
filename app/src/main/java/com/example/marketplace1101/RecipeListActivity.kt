@@ -3,10 +3,12 @@ package com.example.marketplace1101
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.GravityCompat
@@ -27,7 +29,7 @@ import retrofit2.http.Query
 data class Receita(
     var id: String = "",
     var nome: String = "",
-    var imagemUrl: String = "",
+    var imagemUrl: String? = null,
     var origem: String = "",
     var instrucoes: String = "",
     var categoria: String = ""
@@ -97,6 +99,7 @@ class RecipeListActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
         val searchView = findViewById<SearchView>(R.id.searchView)
+        chipGroup = findViewById(R.id.chipGroupCategoria)
 
         drawerToggle = ActionBarDrawerToggle(
             this,
@@ -110,7 +113,6 @@ class RecipeListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = findViewById(R.id.recipeRecyclerView)
-        chipGroup = findViewById(R.id.chipGroupCategoria)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         retrofit = Retrofit.Builder()
@@ -119,14 +121,6 @@ class RecipeListActivity : AppCompatActivity() {
             .build()
 
         service = retrofit.create(MealService::class.java)
-
-        for (i in 0 until chipGroup.childCount) {
-            val chip = chipGroup.getChildAt(i) as? Chip
-            chip?.setOnCheckedChangeListener { _, _ -> buscarReceitasMultiplasCategorias() }
-        }
-
-        val primeiroChip = chipGroup.getChildAt(0) as? Chip
-        primeiroChip?.isChecked = true
 
         val headerView = navigationView.getHeaderView(0)
         val userName = headerView.findViewById<TextView>(R.id.textUserName)
@@ -145,6 +139,9 @@ class RecipeListActivity : AppCompatActivity() {
                     FirebaseAuth.getInstance().signOut()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
+                }
+                R.id.nav_preferencias_receitas -> {
+                    mostrarDialogPreferencias()
                 }
             }
             drawerLayout.closeDrawers()
@@ -170,6 +167,109 @@ class RecipeListActivity : AppCompatActivity() {
                 return true
             }
         })
+        mostrarDialogPreferencias()
+
+
+    }
+
+    private fun configurarChips(categorias: List<String>) {
+        chipGroup.removeAllViews()
+        for (categoria in categorias) {
+            val chip = Chip(this)
+            chip.text = categoria
+            chip.isCheckable = true
+            chip.isChecked = true
+            chip.setOnCheckedChangeListener { _, _ -> buscarReceitasMultiplasCategorias() }
+            chipGroup.addView(chip)
+        }
+    }
+
+    private fun mostrarDialogPreferencias() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_preferencias, null)
+        val chipGroup = dialogView.findViewById<ChipGroup>(R.id.chipGroupPreferencias)
+        val btnSalvar = dialogView.findViewById<Button>(R.id.btnSalvarPreferencias)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        btnSalvar.setOnClickListener {
+            val categoriasSelecionadas = mutableListOf<String>()
+            for (i in 0 until chipGroup.childCount) {
+                val chip = chipGroup.getChildAt(i) as? Chip
+                if (chip?.isChecked == true) {
+                    categoriasSelecionadas.add(chip.tag.toString())
+                }
+            }
+
+            if (categoriasSelecionadas.isEmpty()) {
+                Toast.makeText(this, "Selecione pelo menos uma categoria", Toast.LENGTH_SHORT).show()
+            } else {
+                getSharedPreferences("preferencias_usuario", MODE_PRIVATE)
+                    .edit()
+                    .putStringSet("categorias", categoriasSelecionadas.toSet())
+                    .apply()
+
+                dialog.dismiss()
+                adicionarChipsDinamicos(categoriasSelecionadas)
+                buscarReceitasPorCategorias(categoriasSelecionadas)
+            }
+        }
+
+        dialog.show()
+    }
+    private fun adicionarChipsDinamicos(categoriasSelecionadas: List<String>) {
+        chipGroup.removeAllViews()
+
+        for (categoria in categoriasSelecionadas) {
+            val chip = Chip(this).apply {
+                text = categoria
+                isCheckable = true
+                isChecked = true
+            }
+
+            chip.setOnCheckedChangeListener { _, _ ->
+                buscarReceitasMultiplasCategorias()
+            }
+
+            chipGroup.addView(chip)
+        }
+    }
+
+
+
+    private fun buscarReceitasPorCategorias(categorias: List<String>) {
+        receitasTotais.clear()
+
+        for (categoria in categorias) {
+            service.listarReceitas(categoria).enqueue(object : Callback<MealsResponse> {
+                override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
+                    val novasReceitas = response.body()?.meals?.map {
+                        Receita(
+                            id = it.idMeal,
+                            nome = it.strMeal,
+                            imagemUrl = it.strMealThumb,
+                            origem = it.strArea.orEmpty(),
+                            categoria = it.strCategory.orEmpty(),
+                            instrucoes = it.strInstructions.orEmpty()
+                        )
+                    } ?: emptyList()
+
+                    receitasTotais.addAll(novasReceitas)
+
+                    recyclerView.adapter = ReceitaAdapter(receitasTotais) { receita ->
+                        val intent = Intent(this@RecipeListActivity, RecipeDetailActivity::class.java)
+                        intent.putExtra("id", receita.id)
+                        startActivity(intent)
+                    }
+                }
+
+                override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
+                    Toast.makeText(this@RecipeListActivity, "Erro: ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -209,33 +309,6 @@ class RecipeListActivity : AppCompatActivity() {
             return
         }
 
-        for (categoria in categoriasSelecionadas) {
-            service.listarReceitas(categoria).enqueue(object : Callback<MealsResponse> {
-                override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
-                    val novasReceitas = response.body()?.meals?.map {
-                        Receita(
-                            id = it.idMeal,
-                            nome = it.strMeal,
-                            imagemUrl = it.strMealThumb,
-                            origem = it.strArea.orEmpty(),
-                            categoria = it.strCategory.orEmpty(),
-                            instrucoes = it.strInstructions.orEmpty()
-                        )
-                    } ?: emptyList()
-
-                    receitasTotais.addAll(novasReceitas)
-
-                    recyclerView.adapter = ReceitaAdapter(receitasTotais) { receita ->
-                        val intent = Intent(this@RecipeListActivity, RecipeDetailActivity::class.java)
-                        intent.putExtra("id", receita.id)
-                        startActivity(intent)
-                    }
-                }
-
-                override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
-                    Toast.makeText(this@RecipeListActivity, "Erro: ${t.message}", Toast.LENGTH_LONG).show()
-                }
-            })
-        }
+        buscarReceitasPorCategorias(categoriasSelecionadas)
     }
 }

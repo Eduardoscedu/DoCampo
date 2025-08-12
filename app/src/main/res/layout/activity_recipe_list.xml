@@ -45,7 +45,6 @@
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
-
         <ImageView
             android:id="@+id/imageLogo"
             android:layout_width="100dp"
@@ -56,38 +55,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+
+
+        <!-- CHIPS (AGORA ESCONDIDOS POR PADRÃO) -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupCategoria"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/imageLogo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:singleSelection="false"
             app:selectionRequired="false">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipBeef"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Beef"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipChicken"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chicken"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSeafood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Seafood"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
+            <!-- TODOS OS CHIPS ABAIXO ESTÃO IGUAIS -->
+            <com.google.android.material.chip.Chip android:id="@+id/chipBeef" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Beef" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipChicken" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chicken" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipSeafood" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Seafood" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPork" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pork" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipLamb" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lamb" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipMisc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Miscellaneous" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPasta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pasta" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipSide" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Side" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipStarter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Starter" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipBreakfast" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Breakfast" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipGoat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Goat" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipVegan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Vegan" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipVegetarian" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Vegetarian" style="@style/Widget.MaterialComponents.Chip.Choice"/>
         </com.google.android.material.chip.ChipGroup>
 
         <androidx.appcompat.widget.SearchView
@@ -104,7 +100,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:padding="8dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="60dp"
             app:layout_constraintTop_toBottomOf="@id/chipGroupCategoria"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
